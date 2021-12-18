@@ -1,5 +1,5 @@
 float calcShift, lengNoiseX, lengNoiseY, angNoiseX, angNoiseY;
-String sys;
+String[] sys = new String[2];
 
 
 
@@ -8,6 +8,7 @@ String sys;
 
   
   // Recursive config(再帰関連の設定)
+  //Default setting is make like a snowflake.
     
     int gen = 6;
       //再帰回数。8以上の数値は計算数が膨大になるため7以下に設定を推奨。
@@ -72,9 +73,9 @@ void setup(){
   size(1000, 1000);
   noiseSeed(seed);
   
-  if(autoSetting_Angles == true){
+  if(autoSetting_Angles){
     sys = autoSetting();  //角度自動設定機能を呼び出し。
-    println(sys);  //ちゃんと動いたかどうかを出力。
+    println(sys[0],"\n"+sys[1]);  //ちゃんと動いたかどうかを出力。
   }
   
   backgroundSet();
@@ -85,7 +86,7 @@ void setup(){
   stroke(colorS[0], colorS[1], colorS[2]);
   
   
-  if(fraction == true){
+  if(fraction){
     calcShift = 1/shift;
   }else{
     calcShift = shift;
@@ -95,10 +96,14 @@ void setup(){
   
   for(int i = 0; i < branch; i++){
     //再帰　始動。
+    //Recursion is here.
+    
     calcCoord(gen, 0, 0, leng, angle*i);
   }
   
   //save("images.png");
+  //If you want to save result, remove commentout on save function.
+  //Caution:File name is fixed. if exist same name already, it will be overwrite.
 }
 
 
@@ -106,6 +111,7 @@ void setup(){
 
 void calcCoord(int gen1, float xs, float ys, float leng1, float ang){  
   //座標の計算。
+  //Calculate Next generation coordinates.
   
   noiseMaker(xs, ys);
   
@@ -117,6 +123,7 @@ void calcCoord(int gen1, float xs, float ys, float leng1, float ang){
 
 void drawLine(int gen1, float xS, float yS, float xE, float yE, float leng2){  
   //lineを描写。
+  //line drawing.
   
   stroke(colorS[0]+int(random(20)), colorS[1]+int(random(20)), colorS[2]-int(random(10)));
   line(xS, yS, xE, yE);
@@ -127,7 +134,7 @@ void drawLine(int gen1, float xS, float yS, float xE, float yE, float leng2){
     }
   }
   
-  if(onemoreLine == true){
+  if(onemoreLine){
     line(xS*1.5, yS*1.5, xE*1.5, yE*1.5);
     
     if(gen1 > 0){
@@ -140,19 +147,20 @@ void drawLine(int gen1, float xS, float yS, float xE, float yE, float leng2){
 
 void noiseMaker(float xs, float ys){
   //ノイズを作る関数
-  if(noiseOn == true){
+  //Making noise if noiseOn is true.
+  
+  if(noiseOn){
       lengNoiseX = noise(0.2 *pow( 2, abs(xs) ));
       lengNoiseY = noise(0.2 *pow( 2, abs(ys) ));
       
       angNoiseX = noise(3 *pow( 17, abs(xs) ));
       angNoiseY = noise(3 *pow( 17, abs(ys) ));
-  }else{
-    
   }
 }
 
 void backgroundSet(){
   //背景作成
+  //Making background
   
   colorMode(HSB,360,2000,1000);
   
@@ -166,37 +174,27 @@ void backgroundSet(){
   
   for(int i = 0; i < 200; i++){
     for(int j = 0; j < 200; j++){
-      
-      int ie = i*(width/200);
-      int je = j*(height/200);
       fill(0, 0, 1000);
       rectMode(CENTER);
       
-      //preCalcCoord();
-      
-      //if((i+j) % 4 == 0){
-      //  pushMatrix();
-      //  rotate(PI/4);
-      //  rect(0+ie,0+je,1,1);
-      //  popMatrix();
-      //}else{
-        rect(0+ie,0+je,4,4);
-      //}
     }
   }
 }
 
-String autoSetting(){
+String[] autoSetting(){
   //角度の自動設定機能
+  //Autosetting to var"angle".
   
-  String systemMessage = "none";
+  String[] systemMessage = {"none","none"};
   if(branch != 0 && onemore_branch != 0){
     angle = 360/branch;
     onemore_angle = 360/onemore_branch;
     
-    systemMessage = "角度の自動設定機能は正常に動作しました。";
+    systemMessage[0] = "角度の自動設定機能は正常に動作しました。";
+    systemMessage[1] = "AutosettingAngles is done.";
   }else{
-    systemMessage = "いずれかの枝の値に0が入っています。0除算の原因となるため、枝分かれを0に設定することはできません。";
+    systemMessage[0] = "いずれかの枝の値に0が入っています。0除算の原因となるため、枝分かれを0に設定することはできません。";
+    systemMessage[1] = "Detect 0 in \"branch\" or \"onemore_branch\" value. Branch amount can't setting at 0, because induce to Zero division.";
     exit();
   }
   return systemMessage;
